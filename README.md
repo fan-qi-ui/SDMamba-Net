@@ -16,25 +16,6 @@ Each module directory includes original implementation files under `source/`, in
 
 Download [CrackMix.zip](CrackMix.zip) and extract it to obtain the `CrackMix/` directory. See [CrackMix 数据集说明书](CrackMix_数据集说明书.txt) for file formats, image sizes, pairing rules, preprocessing, and experimental use.
 
-CrackMix combines 537 images from DeepCrack and 108 images from CrackMap. It corresponds to the manuscript's 645-image mixed dataset.
-
-| Split | Images | Masks | DeepCrack images | CrackMap images |
-| --- | ---: | ---: | ---: | ---: |
-| Training | 384 | 384 | 300 | 84 |
-| Test | 261 | 261 | 237 | 24 |
-| Total | 645 | 645 | 537 | 108 |
-
-```text
-CrackMix/
-  train_img/
-  train_lab/
-  test_img/
-  test_lab/
-  README.md
-  FILE_MANIFEST.csv
-```
-
-Images are RGB; masks are grayscale PNG images with values 0 (background) and 255 (crack). Image–mask pairs share their filename stem. Original resolutions and train/test splits are preserved. The dataset is stored as a ZIP in this repository.
 
 ## Verification and attribution
 
