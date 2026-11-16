@@ -1,0 +1,82 @@
+﻿DASR 方向感知稀疏细化模块说明书
+
+一、说明对象与文章依据
+本说明书对应 DASR.zip。DASR 的英文全称为 Direction-Aware Sparse Refinement。
+内容依据 SDMamba-Net1114.docx 第 3.1、3.3 节及图 2、图 4，并结合本次压缩包中的实际源码编写。
+该模块位于各编码阶段的 SEMM 之后，由候选约束稀疏注意力 CCSA 和方向引导边缘门控 DEG 顺序组成。
+
+二、设计目的与工作原理
+DASR 面向裂缝空间分布稀疏、局部方向变化显著和背景纹理容易干扰的问题，以候选位置交互和方向条件门控细化特征。
+1. CCSA 候选评分：将输入空间位置展开成 token，并由归一化与卷积评分分支生成各位置分数。
+2. 候选选择与交互：为每个样本选择得分最高的 K 个位置，收集完整通道向量，仅在候选 token 间计算多头注意力。
+3. 稀疏回填：将候选交互结果按原位置索引 scatter 回完整空间，再通过输入门控和可学习缩放，与原特征残差相加。未选位置的原始表示通过残差路径保留。
+4. DEG 方向统计：将特征划分成 2×2 个非重叠子块，子块并入批次维；对通道均值响应使用 Sobel 算子获得梯度方向，取绝对角度并进行方向区间统计。
+5. 方向条件调制：将方向统计转换为条件特征，与位置相关特征结合形成门控；通过水平方向、垂直方向分解卷积等局部变换补充边缘邻域响应。
+6. 恢复与融合：将子块还原至空间布局，加入残差，随后执行原代码的融合卷积。
+方向统计来自网络特征，并非人工提供的裂缝方向标签；候选评分也不等同于已有裂缝真值。
+
+三、压缩包中的源码位置
+source/models/layers/freq_sparse.py
+  CrackCandidateSparseAttention：候选评分、top-k、候选注意力、scatter 回填与残差门控。
+source/models/layers/hog_edge.py
+  HoGEdgeGateConv：方向统计与条件门控。
+  EdgeConv：方向分解卷积。
+  image2patches、patches2image：子块划分与还原。
+reference/models/encoder/vss_block.py
+  ccsa_deg 分支展示完整 DASR，即 CCSA 后接 DEG。
+reference/models/segmentor/MixerCSeg.py
+  提供原工程的模型构建参考。
+SOURCE_MANIFEST.json
+  记录复制来源及 SHA-256 校验值。
+freq_sparse.py 原本同时定义 CCSA 和 FHE，因此保留完整文件；DASR 使用其中的 CCSA 类。
+
+四、输入输出与当前实现参数
+输入与输出格式均为 [B, C, H, W]，保持通道数及空间尺寸。
+CCSA 默认参数为：
+  candidate_ratio=0.125
+  min_tokens=64
+  max_tokens=1024
+  max_heads=4
+  attn_drop=0.0，proj_drop=0.0
+候选数量按下式确定，其中 N=H×W：
+  K = min(max_tokens, max(min_tokens, floor(N×candidate_ratio)), N)
+实际注意力头数根据通道数向下调整，保证能整除通道数。
+原实现的稀疏残差缩放参数 gamma 初始为 0.1。
+DEG 默认 nbins=180、cell_size=(8,8)。实现中的方向频数以 64 归一化，对应默认 8×8 统计单元。
+完整原模型四阶段通道为 [16, 32, 64, 128]；512×512 输入对应空间边长为 128、64、32、16。
+空间边长使用偶数且至少为 16，以满足 2×2 子块划分和子块内 8×8 统计要求；通道数需适配原 GroupNorm 配置。
+
+五、依赖与使用方法
+主要依赖：PyTorch、einops，详见 requirements.txt。
+原完整工程中，构造 VSS 前设置 MIXER_DASR_VARIANT=ccsa_deg 可选择完整 DASR；只保留 DASR 时可同时设置 MIXER_SEMM_VARIANT=none。
+MIXER_DASR_VARIANT=ccsa 仅启用候选稀疏注意力，属于消融配置，不等同于完整 DASR。
+原工程还支持 MIXER_CSA_RATIO、MIXER_CSA_MAX_TOKENS 运行时覆盖；独立构造类时使用显式参数即可。
+以下示例在解压后的 DASR 文件夹内运行。
+
+from pathlib import Path
+import importlib.util
+
+def load_source(relative_path, module_name):
+    spec = importlib.util.spec_from_file_location(module_name, Path(relative_path))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+import torch
+from torch import nn
+freq = load_source('source/models/layers/freq_sparse.py', 'dasr_sparse_source')
+edge = load_source('source/models/layers/hog_edge.py', 'dasr_edge_source')
+dasr = nn.Sequential(
+    freq.CrackCandidateSparseAttention(dim=16, candidate_ratio=0.125,
+        min_tokens=64, max_tokens=1024, max_heads=4),
+    edge.HoGEdgeGateConv(in_dim=16, nbins=180),
+).eval()
+with torch.no_grad():
+    output = dasr(torch.randn(1, 16, 32, 32))  # [1, 16, 32, 32]
+
+六、使用范围与验证情况
+source 和 reference 保留原始代码；reference 用于查看完整工程中的集成关系，不包含运行该工程所需的全部依赖。
+本包不包含完整训练入口、预训练权重或数据集。
+已核对源码校验值、Python 语法与 ZIP 完整性；本次整理未运行模型前向或训练实验。
+文章中的完整模型成绩不能直接作为独立 DASR 模块的实验成绩。
+代码来源与许可见压缩包中的 LICENSE 和原始源码声明。
