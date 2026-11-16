@@ -10,8 +10,6 @@ Code modules and the CrackMix dataset accompanying SDMamba-Net. The module descr
 | DASR | Direction-Aware Sparse Refinement | [DASR](DASR/) | [DASR.zip](DASR.zip) | [说明书](DASR_说明书.txt) |
 | MCFBR | Multi-scale Channel Fusion and Boundary Refinement Decoder | [MCFBR](MCFBR/) | [MCFBR.zip](MCFBR.zip) | [说明书](MCFBR_说明书.txt) |
 
-Each module directory includes original implementation files under `source/`, integration references under `reference/`, a README with usage examples, requirements, and a SHA-256 source manifest. Original implementation names such as `TransMixer` and `SRFModule` are retained. These packages contain individual structures and integration references; a complete end-to-end training project and pretrained weights are not included.
-
 ## CrackMix dataset
 
 Download [CrackMix.zip](CrackMix.zip) and extract it to obtain the `CrackMix/` directory. See [CrackMix 数据集说明书](CrackMix_数据集说明书.txt) for file formats, image sizes, pairing rules, preprocessing, and experimental use.
