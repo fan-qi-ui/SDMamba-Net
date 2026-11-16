@@ -15,8 +15,4 @@ Code modules and the CrackMix dataset accompanying SDMamba-Net. The module descr
 Download [CrackMix.zip](CrackMix.zip) and extract it to obtain the `CrackMix/` directory. See [CrackMix 数据集说明书](CrackMix_数据集说明书.txt) for file formats, image sizes, pairing rules, preprocessing, and experimental use.
 
 
-## Verification and attribution
 
-[ARCHIVE_SHA256.json](ARCHIVE_SHA256.json) records archive sizes and SHA-256 checksums. Source manifests are provided within the module packages, and a per-file data manifest is included in CrackMix.zip. Copied files and ZIP integrity have been checked. Model forward passes and training were not run during packaging.
-
-The code retains the original project's [LICENSE](LICENSE) and source copyright notices. Dataset usage remains subject to the original DeepCrack and CrackMap terms; the code license does not grant additional dataset rights.
