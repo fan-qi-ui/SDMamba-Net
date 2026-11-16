@@ -1,0 +1,26 @@
+[
+  {
+    "name": "MCFBR.zip",
+    "files": 6,
+    "bytes": 6889,
+    "sha256": "2a6c82dae01205aa2bd30707fdf813bc8a64d3031b51f4031ec663f135c48fb8"
+  },
+  {
+    "name": "SEMM.zip",
+    "files": 46,
+    "bytes": 145737,
+    "sha256": "35b4596ab047c112f40ba80c41b2868a07cd44513842c7ed20b27d8c8263eef7"
+  },
+  {
+    "name": "DASR.zip",
+    "files": 8,
+    "bytes": 11237,
+    "sha256": "40fb7a11b22c0375ccb87d91794401895e0b47d866627ce133f98bf24b2c784e"
+  },
+  {
+    "name": "CrackMix.zip",
+    "files": 1292,
+    "bytes": 83921813,
+    "sha256": "216f3b9dbe325e9f617e68a1e436db6b6fd01708bb29f7ffc0929fcabafb84df"
+  }
+]

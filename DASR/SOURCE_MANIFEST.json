@@ -1,0 +1,26 @@
+[
+  {
+    "source": "models/layers/freq_sparse.py",
+    "copy": "source/models/layers/freq_sparse.py",
+    "bytes": 4852,
+    "sha256": "c09091a60b8302f78b1ba15e24900905de71e5ed38aaf4e7373c1b22d0fac385"
+  },
+  {
+    "source": "models/layers/hog_edge.py",
+    "copy": "source/models/layers/hog_edge.py",
+    "bytes": 5036,
+    "sha256": "fc9fd40ae70f87046134989329b12da7f527bc0072a019c1f7ae5b879777c6d8"
+  },
+  {
+    "source": "models/encoder/vss_block.py",
+    "copy": "reference/models/encoder/vss_block.py",
+    "bytes": 12690,
+    "sha256": "bca0b85310aceda665f71ca35e0dbc962d37bc63e6194ab2ab2ecabf2de89cf0"
+  },
+  {
+    "source": "models/segmentor/MixerCSeg.py",
+    "copy": "reference/models/segmentor/MixerCSeg.py",
+    "bytes": 5591,
+    "sha256": "076596faa5d1baf3836da4aa5eb250471c61d09faf6e8b3f95ad853e3dfecfc0"
+  }
+]
